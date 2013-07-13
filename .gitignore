@@ -45,3 +45,4 @@ local_settings.py
 development.db
 modules/ucenter/static/uploads
 src/modules/ucenter/static/uploads
+dev.db
