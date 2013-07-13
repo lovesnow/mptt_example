@@ -1,0 +1,66 @@
+{% load mptt_tags %}
+
+<ul>
+    {% recursetree nodes %}
+    <li>
+        {{ node.name }}
+        {% if not node.is_leaf_node %}
+           <ul class="children">
+			 {{ children }}
+           </ul>
+		{% endif %}
+    </li>
+	{% endrecursetree %}
+</ul>
+
+{% full_tree_for_model genres.Genre as genres %}
+{% for genre,structure in genres|tree_info %}
+    {% if structure.new_level %}
+       <ul>
+         <li>
+    {% else %}
+         </li>
+         <li>
+    {% endif %}
+
+    {{ genre.name }}
+    {% for level in structure.closed_levels %}
+         </li>
+       </ul>
+    {% endfor %}
+{% endfor %}
+
+<br />	   
+<p>
+tree_info和tree_path的用法：	   
+</p>
+<select name="classifiers" multiple="multiple" size="10">
+    {% for node,structure in genres|tree_info:"ancestors" %}
+        {% if node.is_child_node %}
+            <option value="{{ node.pk }}">
+                {{ structure.ancestors|tree_path:" > " }} > {{ node }}
+            </option>
+        {% endif %}
+    {% endfor %}
+</select>	   
+
+
+
+
+{% drilldown_tree_for_node genre as drilldown cumulative count shop.Product.region in product_count %}
+{% for node,structure in drilldown|tree_info %}
+    {% if structure.new_level %}
+       <ul><li>
+    {% else %}
+       </li><li>
+    {% endif %}
+	   
+    {% ifequal node genre %}
+        <strong>{{ node.name }}</strong>
+    {% else %}
+        <a href="#">{{ node.name }}</a>
+        {% ifequal node.parent_id genre.pk %}({{ node.product_count }}){% endifequal %}
+    {% endifequal %}
+	   
+    {% for level in structure.closed_levels %}</li></ul>{% endfor %}
+{% endfor %}
